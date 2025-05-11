@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Körkort – 25 Basuppdrag | AINNOVA</title>
+  <style>
+    :root {
+      --primary-color: #9fe754;
+      --primary-dark: #8dd246;
+      --text-color: #333;
+      --subtitle-color: #666;
+      --border-color: #e0e0e0;
+      --background-light: #f9f9f9;
+    }
+    
+    * {box-sizing: border-box; margin: 0; padding: 0;}
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.5;
+      color: var(--text-color);
+      background-color: #fafafa;
+    }
+    
+    h1, h2, h3 {color: var(--text-color); margin-bottom: 15px;}
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .logo {
+      height: 28px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    
+    .title {
+      font-weight: bold;
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .subtitle {
+      font-style: italic;
+      margin-bottom: 10px;
+      color: var(--subtitle-color);
+      font-size: 14px;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 15px 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    
+    .section h2 {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    
+    .info-field {
+      display: flex;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    
+    .info-field label {
+      width: 70px;
+      font-weight: bold;
+    }
+    
+    .info-field input {
+      flex: 1;
+      border: none;
+      border-bottom: 2px solid var(--border-color);
+      padding: 8px 5px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+    
+    .info-field input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+    
+    .badge-levels {
+      margin-top: 15px;
+      font-size: 0.95em;
+      color: var(--subtitle-color);
+      text-align: center;
+      background-color: var(--background-light);
+      padding: 10px;
+      border-radius: 6px;
+    }
+    
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+    
+    .tasks-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .tasks-table th {
+      text-align: left;
+      padding: 10px 15px;
+      border-bottom: 2px solid var(--border-color);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .tasks-table th:first-child {
+      width: 60px;
+      text-align: center;
+    }
+    
+    .tasks-table td {
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+    
+    .tasks-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .custom-checkbox {
+      display: block;
+      position: relative;
+      width: 24px;
+      height: 24px;
+      margin: 0 auto;
+    }
+    
+    .custom-checkbox input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 24px;
+      width: 24px;
+      background-color: #fff;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .custom-checkbox:hover input ~ .checkmark {
+      border-color: var(--primary-dark);
+    }
+    
+    .custom-checkbox input:checked ~ .checkmark {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 8px;
+      top: 4px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
+    
+    .custom-checkbox input:checked ~ .checkmark:after {
+      display: block;
+    }
+    
+    .task-title {
+      font-weight: 600;
+    }
+    
+    .task-description {
+      color: var(--subtitle-color);
+      font-size: 0.95em;
+    }
+    
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .summary-item {
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid var(--border-color);
+      padding: 15px;
+      border-radius: 8px;
+      background-color: var(--background-light);
+      text-align: center;
+    }
+    
+    .summary-item-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--subtitle-color);
+      text-transform: uppercase;
+      font-size: 0.9em;
+      letter-spacing: 1px;
+    }
+    
+    .summary-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .bronze { color: #cd7f32; }
+    .silver { color: #a8a9ad; }
+    .gold { color: #d4af37; }
+    .platinum { color: #e5e4e2; }
+    
+    .instructions {
+      background-color: #f0f7ea;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary-color);
+      margin-bottom: 20px;
+    }
+    
+    .instructions h3 {
+      margin-bottom: 10px;
+    }
+    
+    ol {
+      margin-left: 25px;
+      padding-left: 10px;
+    }
+    
+    .instructions li, .section li {
+      margin-bottom: 5px;
+    }
+    
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-secondary {
+      background-color: #f1f1f1;
+      color: #555;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .copyright {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      font-size: 0.9em;
+      color: var(--subtitle-color);
+      text-align: center;
+      line-height: 1.5;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--subtitle-color);
+      font-size: 0.9em;
+      padding-bottom: 20px;
+    }
+    
+    @media print {
+      @page {
+        margin: 1cm;
+        size: portrait;
+      }
+      
+      body {
+        font-size: 12pt;
+        background-color: white;
+        padding: 0;
+      }
+      
+      .section {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 15px;
+      }
+      
+      .btn-container, .instructions {
+        display: none;
+      }
+      
+      .custom-checkbox input:checked ~ .checkmark {
+        background-color: var(--primary-color) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .checkmark {
+        border: 2px solid #999 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .summary-value {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      /* Forcera checklistan att börja på en ny sida */
+      .checklist-section {
+        page-break-before: always;
+        break-before: always;
+      }
+      
+      .copyright, footer {
+        page-break-before: avoid;
+        break-before: avoid;
+      }
+    }
+    
+    @media screen and (max-width: 768px) {
+      .tasks-table {
+        min-width: 600px;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+    
+    @media screen and (max-width: 600px) {
+      .section {
+        padding: 12px 15px;
+      }
+      
+      .info-field {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .info-field label {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      
+      .summary-item {
+        min-width: 100%;
+      }
+      
+      /* Mobilanpassad tabellvy */
+      .tasks-table, .tasks-table thead, .tasks-table tbody, .tasks-table th, .tasks-table td, .tasks-table tr { 
+        display: block; 
+      }
+      
+      .tasks-table thead tr { 
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+      
+      .tasks-table tr { 
+        border: 1px solid #ccc; 
+        margin-bottom: 10px;
+        border-radius: 5px;
+      }
+      
+      .tasks-table td { 
+        border: none;
+        position: relative;
+        padding-left: 15px; 
+        text-align: left;
+      }
+      
+      .tasks-table td:first-child {
+        padding: 10px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        background-color: #f9f9f9;
+      }
+      
+      .tasks-table td:nth-child(2) {
+        font-weight: bold;
+        padding-top: 15px;
+      }
+      
+      .custom-checkbox {
+        margin: 0;
+      }
+      
+      /* Återställ tabellens minimum bredd */
+      .tasks-table {
+        min-width: initial;
+      }
+      
+      .table-responsive {
+        overflow-x: visible;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="title">
+      <img src="https://valingeveckan.wordpress.com/wp-content/uploads/2025/04/namnlos-design-4-1.png" alt="AINNOVA Logo" class="logo"> 
+      AI-Körkort – 25 Basuppdrag
+    </h1>
+    <div class="subtitle">Interaktiv checklista • Sparas automatiskt i din webbläsare</div>
+  </div>
+  
+  <div class="section">
+    <h2>
+      <img src="https://valingeveckan.wordpress.com/wp-content/uploads/2025/04/namnlos-design-4-1.png" alt="AINNOVA Icon" class="logo">
+      Deltagarinfo
+    </h2>
+    <div class="info-field">
+      <label for="name">Namn:</label>
+      <input type="text" id="name" placeholder="Ditt namn">
+    </div>
+    <div class="info-field">
+      <label for="start">Start:</label>
+      <input type="text" id="start" placeholder="Startdatum">
+    </div>
+    <div class="info-field">
+      <label for="end">Slut:</label>
+      <input type="text" id="end" placeholder="Slutdatum">
+    </div>
+    <div class="badge-levels">
+      <strong>Badge-nivåer:</strong> Bronze = 1–4 ✓ • Silver = 5–14 ✓ • Guld = 15–24 ✓ • Platina = 25 ✓
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2>
+      <img src="https://valingeveckan.wordpress.com/wp-content/uploads/2025/04/namnlos-design-4-1.png" alt="AINNOVA Icon" class="logo">
+      Summering
+    </h2>
+    <div class="summary">
+      <div class="summary-item">
+        <div class="summary-item-title">ANTAL AVKLARADE</div>
+        <div id="count-value" class="summary-value">0</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-title">BADGE-NIVÅ</div>
+        <div id="badge-value" class="summary-value">-</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2>
+      <img src="https://valingeveckan.wordpress.com/wp-content/uploads/2025/04/namnlos-design-4-1.png" alt="AINNOVA Icon" class="logo">
+      Så skapar du ditt examensbevis
+    </h2>
+    <ol>
+      <li>Slutför uppgifterna och bocka av dem i listan</li>
+      <li>När du är klar, klicka på "Spara som PDF"</li>
+      <li>Du kan också skriva ut sidan genom att klicka på "Skriv ut"</li>
+      <li>Om du behöver börja om, klicka på "Nollställ"</li>
+    </ol>
+    <div class="btn-container">
+      <button id="print-btn" class="btn" onclick="window.print()">Skriv ut</button>
+      <button id="pdf-btn" class="btn" onclick="window.print()">Spara som PDF</button>
+      <button id="reset-btn" class="btn btn-secondary">Nollställ</button>
+    </div>
+  </div>
+  
+  <!-- Checklistan sist, med en klass för att kontrollera sidbrytning vid utskrift -->
+  <div class="section checklist-section">
+    <h2>
+      <img src="https://valingeveckan.wordpress.com/wp-content/uploads/2025/04/namnlos-design-4-1.png" alt="AINNOVA Icon" class="logo">
+      Checklista
+    </h2>
+    <div class="table-responsive">
+      <table class="tasks-table">
+        <thead>
+          <tr>
+            <th>✓</th>
+            <th>Uppdrag</th>
+            <th>Beskrivning</th>
+          </tr>
+        </thead>
+        <tbody id="tasks-container">
+          <!-- Task items will be inserted here by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <div class="copyright">
+    AINNOVA AB är ett registrerat varumärke. Vi samlar inte dina uppgifter men garanterar att du får en lärorik resa genom våra examensuppgifter. Våra examensbevis kan du kalla "Learning by doing" i ditt CV. "Jag gick AINNOVAS kurs och gjorde alla delmoment."
+  </div>
+  
+  <footer>
+    <p>Version 6.0 – Interaktiv och självständig • Sparar automatiskt dina framsteg</p>
+  </footer>
+
+  <script>
+    // Förbättrade och tydligare uppdragsbeskrivningar
+    const tasks = [
+      { id: 1, title: "100-ordsnovell", description: "Berätta en historia på exakt 100 ord där AI räddar dagen. Var kreativ och koncis!" },
+      { id: 2, title: "5 bild-idéer", description: "Föreslå fem kreativa bildkoncept till din nästa presentation (t.ex. metaforer, diagram eller illustrationer)." },
+      { id: 3, title: "Stilbyte", description: "Skriv om valfri text i tre olika stilar (t.ex. formell, poetisk och humoristisk)." },
+      { id: 4, title: "Promptpoesi", description: "Skapa en effektiv prompt som får AI att skriva en sonett med 14 verser om ett ämne du väljer." },
+      { id: 5, title: "Explain-like-I'm-5", description: "Förklara ett komplext begrepp (t.ex. AI, kvantfysik eller finanskrisen) så enkelt att ett barn förstår." },
+      { id: 6, title: "Lightning-talk-script", description: "Skriv ett 3-minuters presentationsmanus om ett AI-ämne du är intresserad av." },
+      { id: 7, title: "Lista & Bulletify", description: "Ta en lång text och omvandla den till en tydlig och strukturerad punktlista." },
+      { id: 8, title: "Mini-quiz", description: "Skapa 5 intressanta flervalsfrågor med facit inom ett ämne du brinner för." },
+      { id: 9, title: "One-pager-sammanfattning", description: "Kondensera en längre text eller artikel till en koncis sammanfattning som får plats på en A4-sida." },
+      { id: 10, title: "Bias-bingo", description: "Identifiera tre olika kognitiva biaser (tankefel) i en text du väljer. Förklara varför det är bias." },
+      { id: 11, title: "Fact-check light", description: "Ta ett påstående och hitta tre olika källhänvisningar som antingen styrker eller motbevisar det." },
+      { id: 12, title: "Hallucinationstest", description: "Ställ en klurig fråga till en AI och se om den hittar på svar. Dokumentera resultatet." },
+      { id: 13, title: "För- & nackdelar", description: "Lista 3 fördelar och 3 nackdelar med ett AI-verktyg du har provat eller vill prova." },
+      { id: 14, title: "Tonalitets-analys", description: "Analysera känslan (positiv/neutral/negativ) i 5 sociala medie-inlägg och motivera din bedömning." },
+      { id: 15, title: "Policy-pitch", description: "Skriv en halvsida med förslag på etiska regler för AI-användning i en organisation." },
+      { id: 16, title: "Futuristens brev", description: "Skriv ett brev från år 2035 där du beskriver hur AI har förändrat ditt yrke eller bransch." },
+      { id: 17, title: "Risklista", description: "Identifiera och beskriv de 3 största riskerna med generativ AI i skolan eller utbildningssammanhang." },
+      { id: 18, title: "Möjlighets-karta", description: "Beskriv fem positiva sätt som AI kan förbättra din vardag eller ditt arbete." },
+      { id: 19, title: "Ethics FAQ", description: "Skapa en kort FAQ med 5 vanliga frågor och svar om upphovsrätt kopplat till AI-genererat innehåll." },
+      { id: 20, title: "Daglig todolista", description: "Prioritera och strukturera dagens uppgifter på ett effektivt sätt med hjälp av AI." },
+      { id: 21, title: "Inbox Zero-tips", description: "Utveckla 3 strategier för att effektivt rensa och hantera din e-post för bättre produktivitet." },
+      { id: 22, title: "Fokus-timer-idéer", description: "Beskriv 5 olika tekniker för djup fokus under 25-minuterspass (t.ex. Pomodoro-varianter)." },
+      { id: 23, title: "Kreativ paus", description: "Sammanställ 10 korta mikropauser (2-5 min) som boostar kreativitet och återhämtning." },
+      { id: 24, title: "Kvälls-reflektion", description: "Formulera 3 kraftfulla frågor för daglig reflektion som utvecklar självinsikt och inlärning." },
+      { id: 25, title: "Bonus-uppdrag", description: "Skapa ditt eget AI-relaterade uppdrag och genomför det. Var kreativ!" }
+    ];
+    
+    // DOM elements
+    const tasksContainer = document.getElementById("tasks-container");
+    const nameInput = document.getElementById("name");
+    const startInput = document.getElementById("start");
+    const endInput = document.getElementById("end");
+    const countValue = document.getElementById("count-value");
+    const badgeValue = document.getElementById("badge-value");
+    const resetBtn = document.getElementById("reset-btn");
+    
+    // State
+    let completedTasks = [];
+    
+    // Load saved data
+    function loadSavedData() {
+      try {
+        const savedData = localStorage.getItem("aiKorkortData");
+        if (savedData) {
+          const data = JSON.parse(savedData);
+          nameInput.value = data.name || "";
+          startInput.value = data.start || "";
+          endInput.value = data.end || "";
+          completedTasks = data.completedTasks || [];
+        }
+      } catch (e) {
+        console.log("Kunde inte ladda sparad data:", e);
+        completedTasks = [];
+      }
+    }
+    
+    // Save data
+    function saveData() {
+      try {
+        const data = {
+          name: nameInput.value,
+          start: startInput.value,
+          end: endInput.value,
+          completedTasks: completedTasks
+        };
+        localStorage.setItem("aiKorkortData", JSON.stringify(data));
+      } catch (e) {
+        console.log("Kunde inte spara data:", e);
+      }
+    }
+    
+    // Render tasks
+    function renderTasks() {
+      tasksContainer.innerHTML = "";
+      tasks.forEach(task => {
+        const isCompleted = completedTasks.includes(task.id);
+        
+        const taskRow = document.createElement("tr");
+        
+        taskRow.innerHTML = `
+          <td>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="task-${task.id}" ${isCompleted ? "checked" : ""}>
+              <span class="checkmark"></span>
+            </label>
+          </td>
+          <td>
+            <span class="task-title">${task.title}</span>
+          </td>
+          <td class="task-description">${task.description}</td>
+        `;
+        
+        const checkbox = taskRow.querySelector(`#task-${task.id}`);
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) {
+            if (!completedTasks.includes(task.id)) {
+              completedTasks.push(task.id);
+            }
+          } else {
+            completedTasks = completedTasks.filter(id => id !== task.id);
+          }
+          updateSummary();
+          saveData();
+        });
+        
+        tasksContainer.appendChild(taskRow);
+      });
+    }
+    
+    // Update summary
+    function updateSummary() {
+      const count = completedTasks.length;
+      countValue.textContent = count;
+      
+      let badge = "-";
+      let badgeClass = "";
+      
+      if (count >= 1 && count <= 4) {
+        badge = "Bronze";
+        badgeClass = "bronze";
+      } else if (count >= 5 && count <= 14) {
+        badge = "Silver";
+        badgeClass = "silver";
+      } else if (count >= 15 && count <= 24) {
+        badge = "Guld";
+        badgeClass = "gold";
+      } else if (count === 25) {
+        badge = "Platina";
+        badgeClass = "platinum";
+      }
+      
+      badgeValue.textContent = badge;
+      badgeValue.className = "summary-value " + badgeClass;
+    }
+    
+    // Initialize
+    function init() {
+      // Sätt upp händelsehanterare för reset-knappen
+      resetBtn.addEventListener("click", () => {
+        if (confirm("Är du säker på att du vill nollställa alla framsteg?")) {
+          localStorage.removeItem("aiKorkortData");
+          nameInput.value = "";
+          startInput.value = "";
+          endInput.value = "";
+          completedTasks = [];
+          renderTasks();
+          updateSummary();
+        }
+      });
+      
+      // Läs in sparad data
+      loadSavedData();
+      
+      // Rendera uppgifter
+      renderTasks();
+      
+      // Uppdatera sammanfattning
+      updateSummary();
+      
+      // Lägg till händelsehanterare för input-fält
+      nameInput.addEventListener("input", saveData);
+      startInput.addEventListener("input", saveData);
+      endInput.addEventListener("input", saveData);
+      
+      // Sätt dagens datum som standardvärde för startdatum om tomt
+      if (!startInput.value) {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        startInput.value = `${year}-${month}-${day}`;
+        saveData();
+      }
+    }
+    
+    // Starta appen
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
