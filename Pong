@@ -288,6 +288,7 @@ function setCanvasSize() {
     // Se till att bredden inte överskrider containern igen
     newWidth = Math.min(newWidth, containerWidth);
 
+
     canvas.width = newWidth;
     canvas.height = newHeight;
 
@@ -305,13 +306,16 @@ function setCanvasSize() {
     // Behåll bollhastighet relativt konstant, men skala lite
     ball.baseSpeed = 4;
 
+
     // Positionera om objekt efter storleksändring
     leftPaddle.x = PADDLE_WIDTH * scale / 2; // Ge lite marginal från kanten
     rightPaddle.x = canvas.width - (PADDLE_WIDTH * scale) - (PADDLE_WIDTH*scale/2);
 
+
     resetBallAndPaddles(); // Återställ boll och paddelpositioner
     if (gameState === 'playing' || gameState === 'paused') drawGame(); // Rita om spelet om det är igång
 }
+
 
 function startGame(computer) {
     vsComputer = computer;
@@ -342,6 +346,7 @@ function resetBallAndPaddles() {
     ball.dx = Math.cos(angle) * ball.baseSpeed * Math.max(0.8,scale);
     ball.dy = Math.sin(angle) * ball.baseSpeed * Math.max(0.8,scale);
 
+
     leftPaddle.y = canvas.height / 2 - leftPaddle.height / 2;
     rightPaddle.y = canvas.height / 2 - rightPaddle.height / 2;
 }
@@ -366,6 +371,7 @@ function gameLoop(timestamp) {
         return;
     }
 
+
     const deltaTime = timestamp - lastTime;
     if (deltaTime >= frameDelay) { // Kör logik om tillräckligt med tid har passerat
         lastTime = timestamp - (deltaTime % frameDelay); // Justera lastTime för jämnare intervall
@@ -387,6 +393,7 @@ function updateGame() {
     // Se till att paddeln inte går utanför
     leftPaddle.y = Math.max(0, Math.min(canvas.height - leftPaddle.height, leftPaddle.y));
 
+
     // Flytta höger paddel (spelare 2 eller dator)
     if (vsComputer) {
         // Enkel AI för datorn (med viss "mänsklig" tröghet/felmarginal)
@@ -401,4 +408,143 @@ function updateGame() {
                 rightPaddle.y -= rightPaddle.speed * 0.85;
             }
         }
-        //
+        // Se till att AI-paddeln inte går utanför
+        rightPaddle.y = Math.max(0, Math.min(canvas.height - rightPaddle.height, rightPaddle.y));
+
+    } else { // Styrning för spelare 2
+        if (keys.i && rightPaddle.y > 0) {
+            rightPaddle.y -= rightPaddle.speed;
+        }
+        if (keys.k && rightPaddle.y < canvas.height - rightPaddle.height) {
+            rightPaddle.y += rightPaddle.speed;
+        }
+        // Se till att paddeln inte går utanför
+        rightPaddle.y = Math.max(0, Math.min(canvas.height - rightPaddle.height, rightPaddle.y));
+    }
+
+    // Flytta bollen
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // Kollision med tak och golv
+    if (ball.y <= 0 || ball.y + ball.size >= canvas.height) {
+        ball.dy *= -1;
+        ball.y = Math.max(0, Math.min(ball.y, canvas.height - ball.size)); // Förhindra att bollen fastnar
+    }
+
+    // Kollision med vänster paddel
+    if (ball.dx < 0 && // Bollen rör sig åt vänster
+        ball.x <= leftPaddle.x + PADDLE_WIDTH * scale &&
+        ball.x >= leftPaddle.x && // Se till att bollen är framför eller på paddeln
+        ball.y + ball.size >= leftPaddle.y &&
+        ball.y <= leftPaddle.y + leftPaddle.height) {
+        ball.dx *= -1.05; // Studs och öka farten lite
+        ball.x = leftPaddle.x + PADDLE_WIDTH * scale; // Flytta ut bollen från paddeln
+        // Ändra Y-riktning baserat på var på paddeln bollen träffar
+        let deltaY = ball.y + ball.size/2 - (leftPaddle.y + leftPaddle.height/2);
+        ball.dy = deltaY * 0.2 * Math.max(0.8, scale); // Ju längre från mitten, desto skarpare vinkel
+    }
+
+    // Kollision med höger paddel
+    if (ball.dx > 0 && // Bollen rör sig åt höger
+        ball.x + ball.size >= rightPaddle.x &&
+        ball.x + ball.size <= rightPaddle.x + PADDLE_WIDTH*scale && // Se till att bollen är framför eller på paddeln
+        ball.y + ball.size >= rightPaddle.y &&
+        ball.y <= rightPaddle.y + rightPaddle.height) {
+        ball.dx *= -1.05; // Studs och öka farten lite
+        ball.x = rightPaddle.x - ball.size; // Flytta ut bollen från paddeln
+        let deltaY = ball.y + ball.size/2 - (rightPaddle.y + rightPaddle.height/2);
+        ball.dy = deltaY * 0.2 * Math.max(0.8, scale);
+    }
+    
+    // Begränsa bollens vertikala hastighet för att undvika för snabba/långsamma vinklar
+    const maxDy = 6 * Math.max(0.8, scale);
+    ball.dy = Math.max(-maxDy, Math.min(maxDy, ball.dy));
+
+
+    // Poäng
+    if (ball.x + ball.size < 0) { // Bollen passerar vänster kant
+        rightScore++;
+        updateScore();
+        resetBallAndPaddles();
+    }
+    if (ball.x > canvas.width) { // Bollen passerar höger kant
+        leftScore++;
+        updateScore();
+        resetBallAndPaddles();
+    }
+
+    // Vinnare
+    if (leftScore >= WINNING_SCORE || rightScore >= WINNING_SCORE) {
+        gameState = 'gameover';
+    }
+}
+
+function drawGame() {
+    // Rensa canvas
+    ctx.fillStyle = '#000'; // Svart bakgrund
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Rita mittlinje (subtil)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.lineWidth = 2 * Math.max(0.5,scale);
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.stroke();
+
+    // Rita paddlar
+    ctx.fillStyle = '#00AEEF'; // En ljusare, gladare blå för paddlar
+    ctx.fillRect(leftPaddle.x, leftPaddle.y, PADDLE_WIDTH * scale, leftPaddle.height);
+    ctx.fillRect(rightPaddle.x, rightPaddle.y, PADDLE_WIDTH * scale, rightPaddle.height);
+
+    // Rita boll
+    ctx.fillStyle = '#FFFFFF'; // Vit boll
+    ctx.beginPath();
+    ctx.arc(ball.x + ball.size / 2, ball.y + ball.size / 2, ball.size / 2, 0, Math.PI*2);
+    ctx.fill();
+}
+
+function drawGameOver() {
+    // Behåll sista spelbilden, lägg ett mörkt lager över
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = 'white';
+    ctx.font = `bold ${Math.round(22 * Math.max(0.8, scale))}px Arial`;
+    ctx.textAlign = 'center';
+
+    let winnerMessage = '';
+    if (leftScore >= WINNING_SCORE) {
+        winnerMessage = 'Tanten vann! Bra jobbat!';
+    } else if (vsComputer) {
+        winnerMessage = 'Datorn vann den här gången!';
+    } else {
+        winnerMessage = 'Spelare 2 vann! Snyggt!';
+    }
+    ctx.fillText(winnerMessage, canvas.width / 2, canvas.height / 2 - 25 * Math.max(0.8, scale));
+
+    ctx.font = `${Math.round(16 * Math.max(0.8, scale))}px Arial`;
+    ctx.fillText('Välj spelläge ovan för en ny omgång.', canvas.width / 2, canvas.height / 2 + 25 * Math.max(0.8, scale));
+
+    startScreen.style.display = 'block'; // Visa startskärmen igen
+    startScreen.querySelector('h1').textContent = 'Spelet är slut!';
+    status.textContent = "Spelet är slut. Spela igen?";
+}
+
+function drawPaused() {
+    // Behåll spelbilden, lägg ett mörkt lager över
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = 'white';
+    ctx.font = `bold ${Math.round(20 * Math.max(0.8, scale))}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Pausad', canvas.width / 2, canvas.height / 2);
+}
+
+// Starta spelet
+initGame();
+</script>
+</body>
+</html>
