@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AINNOVAAPPAR</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #e6f0fa; /* Light blue background matching your WordPress site */
+            color: #333;
+        }
+        .header {
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+            color: #333;
+        }
+        .header p {
+            font-size: 14px;
+            margin: 5px 0 0;
+            color: #666;
+        }
+        .nav {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007BBF; /* Blue color from your previous designs */
+            font-weight: bold;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .app-links {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .app-link {
+            background-color: #fff;
+            border: 2px solid #007BBF;
+            border-radius: 8px;
+            padding: 15px;
+            width: 200px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .app-link:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AINNOVAAPPAR</h1>
+        <p>Några appar vi testar på GitHub Pages</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">AINNOVA</a>
+        <a href="chatbot.html">Chatbot</a>
+        <a href="korkort.html">Körkort</a>
+        <a href="pong.html">Pong</a>
+        <a href="citatt.html">Citatt</a>
+    </div>
+    <div class="content">
+        <p>
+            Vår riktiga webbplats hittas på <a href="https://ainnova.se" target="_blank">ainnova.se</a>. 
+            Här testar vi endast hur några av våra webbappar ser ut i andra miljöer än där dom designade att landa.
+        </p>
+        <div class="app-links">
+            <a href="pong.html" class="app-link">Spela Pong</a>
+            <a href="citatt.html" class="app-link">Dagligt Citat</a>
+        </div>
+    </div>
+</body>
+</html>
